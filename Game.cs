@@ -41,6 +41,7 @@ public class Game : MonoBehaviour {
 	public enum MessageState {none=0, startgame, nextlevel, kill}	//Статусы сообщений
 	public MessageState GameMessageState;
 
+
 	/// <summary>
 	/// Создаёт новую игру, в том числе загружает случайную карту и сбрасывает все игровые параметры
 	/// </summary>

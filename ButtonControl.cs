@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-// Скрипт вешается на все основные кнопки для управления переходами между экранами
+/// <summary>
+/// Скрипт вешается на все основные кнопки для управления переходами между экранами
+/// </summary>
 public class ButtonControl : MonoBehaviour {
 
 	public MainController.TypeSystemActions CurrentAction;

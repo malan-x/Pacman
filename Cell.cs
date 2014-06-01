@@ -2,7 +2,9 @@
 using System.Collections;
 
 [ExecuteInEditMode]
-// Клетка в редакторе уровней
+/// <summary>
+/// Клетка в редакторе уровней
+/// </summary>
 [RequireComponent (typeof (BoxCollider))]
 [RequireComponent (typeof (UIImageButton))]
 [RequireComponent (typeof (UISprite))]
@@ -13,7 +15,9 @@ public class Cell : MonoBehaviour {
 	public LevelEditor.PenType CellType;	// Тип клетки
 	[HideInInspector] public UIImageButton ImageBtn;
 
-	// Возвращает название спрайта соответствующее типу клетки
+	/// <summary>
+	/// Возвращает название спрайта соответствующее типу клетки
+	/// </summary>
 	string GetSpriteName (LevelEditor.PenType _penType)
 	{
 		switch (_penType)
@@ -52,14 +56,18 @@ public class Cell : MonoBehaviour {
 
 	}
 
-	// Обновляет клетку в зависимости от типа выбранного пера
+	/// <summary>
+	/// Обновляет клетку в зависимости от типа выбранного пера
+	/// </summary>
 	public void UpdatePen ()
 	{
 		ImageBtn.hoverSprite = GetSpriteName (prm.CurrentPen);
 		ImageBtn.pressedSprite = GetSpriteName (prm.CurrentPen);
 	}
 
-	// Обновляет положение и типа клетки
+	/// <summary>
+	/// Обновляет положение и типа клетки
+	/// </summary>
 	public void UpdateCell()
 	{
 		transform.localPosition = new Vector3 (13+Xpos*25, -13-Ypos*25, 0);
@@ -71,14 +79,18 @@ public class Cell : MonoBehaviour {
 		ImageBtn.target.MakePixelPerfect();
 	}
 
-	// Обновляет положение и типа клетки
+	/// <summary>
+	/// Обновляет положение и типа клетки
+	/// </summary>
 	public void UpdateCell(LevelEditor.PenType _cellType)
 	{
 		CellType = _cellType;
 		UpdateCell ();
 	}
 
-	// Попадает ли новая клетка в бункер с привидениями
+	/// <summary>
+	/// Проверяет попадает ли новая клетка в бункер с привидениями
+	/// </summary>
 	bool CheckInBunker (LevelEditor.PenType _cellType)
 	{
 		int cx = (int) (prm.CurrentMap.Ghosts.x);
@@ -86,18 +98,21 @@ public class Cell : MonoBehaviour {
 		return ((_cellType != LevelEditor.PenType.BunkerCenter)&&((cx-2<=Xpos)&&(cx+2>=Xpos)&&(cy-3<=Ypos)&&(cy>=Ypos)));
 	}
 
+	/// <summary>
+	/// Устанавливает выбранный тип клетки
+	/// </summary>
 	public void SetUpCell (LevelEditor.PenType _cellType)
 	{
 		if (!CheckInBunker (_cellType))
 		{
 			switch (_cellType)
 			{
-			case LevelEditor.PenType.PacmanSpawn:
+			case LevelEditor.PenType.PacmanSpawn:	// Устанавливает клетку с пакманом, а предыдущее место затирает
 				MainController.Instance._LevelEditor.Cells[(int) (prm.CurrentMap.PacmanSpawn.x), (int) (prm.CurrentMap.PacmanSpawn.y)].UpdateCell(LevelEditor.PenType.Clear);
 				prm.CurrentMap.PacmanSpawn = new Vector2(Xpos, Ypos);
 				UpdateCell(_cellType);
 				break;
-			case LevelEditor.PenType.BunkerCenter:
+			case LevelEditor.PenType.BunkerCenter:	// Устанавливает клетку с бункером, а предыдущее место затирает
 				int px = (int) (prm.CurrentMap.PacmanSpawn.x);
 				int py = (int) (prm.CurrentMap.PacmanSpawn.y);
 				if (((Xpos+2<prm.CurrentMap.width)&&(Xpos-2>=0)&&(Ypos<prm.CurrentMap.height)&&(Ypos-3>=0))&&	//входит ли в границы карты
@@ -156,11 +171,6 @@ public class Cell : MonoBehaviour {
 		SetUpCell (prm.CurrentPen);
 	}
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-
 	void OnHover (bool isOver)
 	{
 		UpdatePen ();
@@ -177,11 +187,6 @@ public class Cell : MonoBehaviour {
 		{
 			ImageBtn.target.depth = 3;
 		}
-		/*if (isEnabled && target != null)
-		{
-			target.spriteName = isOver ? hoverSprite : normalSprite;
-			target.MakePixelPerfect();
-		}*/
 	}
 	// Update is called once per frame
 	void Update () {

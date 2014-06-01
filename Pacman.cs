@@ -6,7 +6,7 @@ using System.Collections;
 /// </summary>
 [RequireComponent (typeof(SphereCollider))]
 public class Pacman : Move {
-
+	
 	public Vector3 SourceTarget;
 
 	void Start()
@@ -121,24 +121,32 @@ public class Pacman : Move {
 			{
 			case Bonuses.TypeBounes.PowerUp:
 				foreach (GhostAI g in FindObjectsOfType<GhostAI>()) {g.ChangeMode(GhostAI.ModeBehavior.outrun);}
+				MainController.Instance.SoundEatPowerUp.Play();
 				break;
 			case Bonuses.TypeBounes.Point:
 				if ( --prm.PointsCount<=0) {FindObjectOfType<Game>().NextLevel();}
+				MainController.Instance.SoundEatPoint.Play();
+				break;
+			case Bonuses.TypeBounes.Fruit:
+				MainController.Instance.SoundEatFruit.Play();
 				break;
 			}
 			bonus.gameObject.SetActive(false);
 			break;
 		case "Ghosts":
 			GhostAI ghost = other.GetComponent<GhostAI>();
+			MainController.Instance.SoundIntermission.Play();
 			switch (ghost.BehaviorMode)
 			{
 			case GhostAI.ModeBehavior.chase:
 			case GhostAI.ModeBehavior.around:
+				MainController.Instance.SoundDeath.Play();
 				FindObjectOfType<Game>().ShowGameMessage(Game.MessageState.kill);
 				break;
 			case GhostAI.ModeBehavior.outrun:
 				ghost.ChangeMode(GhostAI.ModeBehavior.backtobase);
 				FindObjectOfType<Game>().AddScore(200);
+				MainController.Instance.SoundEatGhost.Play();
 				break;
 			case GhostAI.ModeBehavior.backtobase:
 				break;

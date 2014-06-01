@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Элемент GUI в редакторе уровней, служит для смены пера
+/// </summary>
 public class PacmanGUIElement : MonoBehaviour {
 
 	public enum TypeElement {

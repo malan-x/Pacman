@@ -69,7 +69,14 @@ public class MainController : Singleton<MainController> {
 	public UISlider SpeedSlider;
 	public UISlider TimeSlider;
 
-
+	public AudioSource SoundIntro;
+	public AudioSource SoundEatPoint;
+	public AudioSource SoundEatPowerUp;
+	public AudioSource SoundEatFruit;
+	public AudioSource SoundEatGhost;
+	public AudioSource SoundDeath;
+	public AudioSource SoundIntermission;
+	
 	//Список всех действий
 	public List<TypeSystemActions> ListActions = new List<TypeSystemActions>();
 
@@ -119,10 +126,18 @@ public class MainController : Singleton<MainController> {
 		PlayerPrefs.SetInt("ShowInky", (prm.ShowInky = InkyToggle.value)?1:0);
 		PlayerPrefs.SetInt("ShowClyde", (prm.ShowClyde = ClydeToggle.value)?1:0);
 
-		PlayerPrefs.SetFloat("SoundVolume", prm.SoundVolume = SoundSlider.value);
-		PlayerPrefs.SetFloat("MusicVolume", prm.MusicVolume = MusicSlider.value);
 		PlayerPrefs.SetFloat("PacmanSpeed", prm.PacmanSpeed = TimeSlider.value + 1f);
 		PlayerPrefs.SetFloat("GameSpeed", prm.GameSpeed = SpeedSlider.value);
+		PlayerPrefs.SetFloat("MusicVolume", prm.MusicVolume = MusicSlider.value);
+		SoundIntro.volume = prm.MusicVolume;
+		PlayerPrefs.SetFloat("SoundVolume", prm.SoundVolume = SoundSlider.value);
+		SoundDeath.volume = prm.SoundVolume;
+		SoundEatFruit.volume = prm.SoundVolume;
+		SoundEatGhost.volume = prm.SoundVolume;
+		SoundEatPoint.volume = prm.SoundVolume;
+		SoundEatPowerUp.volume = prm.SoundVolume;
+		SoundIntermission.volume = prm.SoundVolume;
+		
 	}
 
 	/// <summary>
