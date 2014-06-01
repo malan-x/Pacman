@@ -2,7 +2,9 @@
 using System.Collections;
 
 [ExecuteInEditMode]
-// Скрипт с информацией о карте
+/// <summary>
+/// Скрипт с информацией о карте
+/// </summary>
 public class Map : MonoBehaviour {
 
 	public string title;							// название карты
@@ -20,11 +22,6 @@ public class Map : MonoBehaviour {
 
 
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
 	// Update is called once per frame
 	void Update () {
 		UpdateTitle ();

@@ -2,9 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Основной скрипт содержащий игровую логику, функции начала/окончания/загрузки/сохранения игры
+/// </summary>
 public class Game : MonoBehaviour {
 
 	public Camera GameCamera;
+
+	// Префабы игровых клеток
 	public GameObject PrefabClear;
 	public GameObject PrefabWall;
 	public GameObject PrefabPoint;
@@ -12,31 +17,33 @@ public class Game : MonoBehaviour {
 	public GameObject PrefabFruit;
 	public GameObject PrefabDoor;
 
+	// Префабы ключевой точки
 	public GameObject PrefabPathPoint;
 	public List<PathPoint> PathPoints;
 
+	// Модели игрока и ботов
 	public GameObject Pacman;
 	public GameObject Blinky;
 	public GameObject Pinky;
 	public GameObject Inky;
 	public GameObject Clyde;
 
-
+	// Элементы интерфейса
 	public UISprite LivesSprite;
 	public UILabel TitleLabel;
 	public UILabel ScoreLabel;
 	public UILabel StageLabel;
 	public UILabel TipsLabel;
-
 	public UILabel ScoreEndLabel;
 	public UILabel StageEndLabel;
-
 	public UILabel GameMessageLabel;
 
 	public enum MessageState {none=0, startgame, nextlevel, kill}	//Статусы сообщений
 	public MessageState GameMessageState;
 
-	// Начинается новая игра, загружается карта, расставляются персонажи
+	/// <summary>
+	/// Создаёт новую игру, в том числе загружает случайную карту и сбрасывает все игровые параметры
+	/// </summary>
 	public void StartNewGame ()
 	{
 		prm.MaxLevel = 10;
@@ -55,14 +62,18 @@ public class Game : MonoBehaviour {
 		ShowGameMessage(MessageState.startgame);
 	}
 
-	// Устанавливает камера над центром карты
+	/// <summary>
+	/// Устанавливает камеру над центром карты и регулирует угол обзора в зависимости от её высоты
+	/// </summary>
 	void SetUpCamera ()
 	{
 		GameCamera.transform.position = new Vector3 (-0.5f+(float)prm.CurrentMap.width/2f, 20f, 0.5f -(float)prm.CurrentMap.height/2f);
 		GameCamera.fieldOfView = prm.CurrentMap.height*3 ;
 	}
 
-	// Сбрасываем характеристики персонажей
+	/// <summary>
+	/// Сбрасываем характеристики персонажей
+	/// </summary>
 	void ResetPlayers ()
 	{
 		foreach (Move m in FindObjectsOfType<Move>())
@@ -71,12 +82,14 @@ public class Game : MonoBehaviour {
 			m.CurrentMoveStateUnit = Move.MoveState.stay;
 			m.NextMoveStateUnit = Move.MoveState.stay;
 			m.CanChangeDirection = true;
-			m.MarkedPoint = 0;
+			m.MarkedPoints = 0;
 			m.PathList.Clear();
 		}
 	}
 
-	// Рестарт уровня, из-за смерти персонажа или по собственному желанию. -1 жизнь
+	/// <summary>
+	/// Рестарт уровня, из-за смерти персонажа или по собственному желанию. -1 жизнь
+	/// </summary>
 	public void Restart ()
 	{
 		if (0 < prm.LivesCount--)
@@ -91,23 +104,27 @@ public class Game : MonoBehaviour {
 			EndGame();
 			MainController.Instance.MainControl(MainController.TypeSystemActions.ShowEndGame);
 		}
-		/*---------- З А Г Л У Ш К А ----------*/
 	}
 	
-	// Продожает ранее сохранённую игру
+	/// <summary>
+	/// Продожает игру поставленную на паузу
+	/// </summary>
 	public void ResumeGame ()
 	{
 		Time.timeScale = 1f;
-		/*---------- З А Г Л У Ш К А ----------*/
 	}
 	
-	// Ставит на паузу игру
+	/// <summary>
+	/// Ставит на паузу игру
+	/// </summary>
 	public void Pause ()
 	{
 		Time.timeScale = 0f;
-		/*---------- З А Г Л У Ш К А ----------*/
 	}
 
+	/// <summary>
+	/// Возвращает  игровой префаб или существующую модель персонажа в зависимости от типа клетки
+	/// </summary>
 	GameObject CellToPrefabType (LevelEditor.PenType CellType)
 	{
 		switch (CellType)
@@ -131,7 +148,9 @@ public class Game : MonoBehaviour {
 		}
 	}
 
-	// Возвращает принадлежность к неподвижным объектам
+	/// <summary>
+	/// Возвращает принадлежность к неподвижным объектам
+	/// </summary>
 	bool isRealStatic (LevelEditor.PenType CellType)
 	{
 		switch (CellType)
@@ -151,7 +170,9 @@ public class Game : MonoBehaviour {
 
 
 
-	//Создаёт нужный префаб в нужной клетке
+	/// <summary>
+	/// Создаёт нужный префаб в нужной клетке
+	/// </summary>
 	GameObject SetCell (LevelEditor.PenType CellType, int posX, int posY)
 	{
 		if (isRealStatic (CellType))
@@ -210,14 +231,13 @@ public class Game : MonoBehaviour {
 				tempGO.transform.localPosition = new Vector3(posX, 0, -posY);
 				return tempGO;
 			}
-
-			/*---------- З А Г Л У Ш К А ----------*/
-
 		}
 		
 	}
 
-	// Очищает список с объектами
+	/// <summary>
+	/// Очищает список с объектами
+	/// </summary>
 	void ClearListObjects (List<GameObject> listGO)
 	{
 		if (listGO.Count>0)
@@ -227,7 +247,9 @@ public class Game : MonoBehaviour {
 		}
 	}
 
-	// Очищает список с ключевыми точками
+	/// <summary>
+	/// Очищает список с ключевыми точками
+	/// </summary>
 	void ClearPathPoints ()
 	{
 		if (PathPoints.Count>0)
@@ -239,9 +261,9 @@ public class Game : MonoBehaviour {
 
 	public List<GameObject> Blocks;	// Список клеток карты
 
-
-
-	// Загружает выранный уровень
+	/// <summary>
+	/// Загружает выбранный уровень
+	/// </summary>
 	void LoadLevel ()
 	{
 		ClearListObjects(Blocks);	// Очищает текущую карту
@@ -256,13 +278,14 @@ public class Game : MonoBehaviour {
 				CheckPathPoint (prm.CurrentMap.map, x, y);	// Проверяем является ли точка ключевой и добавляем её в список
 			}
 		}
-		ConnectPathPoints (prm.CurrentMap.map);
+		ConnectPathPoints (prm.CurrentMap.map);	//Рассчтиываем ключевые точки
 		SetUpCamera ();
 		StaticBatchingUtility.Combine(gameObject);
-		/*---------- З А Г Л У Ш К А ----------*/
 	}
 
-	// Можно ли двигаться по этой клетке
+	/// <summary>
+	/// Можно ли двигаться по этой клетке
+	/// </summary>
 	bool isPassCell (char CharCell)
 	{
 		switch (MainController.Instance._LevelEditor.CharToCell(CharCell))
@@ -276,7 +299,9 @@ public class Game : MonoBehaviour {
 		}
 	}
 
-	// Возвращает тип ключевой точки
+	/// <summary>
+	/// Возвращает тип ключевой точки
+	/// </summary>
 	PathPoint.PointType GetTypePathPoint (string[] _map, int x, int y)
 	{
 		int leftX = (x+_map[y].Length-1)%_map[y].Length;
@@ -301,7 +326,9 @@ public class Game : MonoBehaviour {
 
 
 
-	// Процедура проверяет является ли точка ключевой и в зависимости от результата создаёт объект
+	/// <summary>
+	/// Процедура проверяет является ли точка ключевой и в зависимости от результата создаёт объект
+	/// </summary>
 	void CheckPathPoint (string[] _map, int x, int y)
 	{
 		if (isPassCell(_map[y][x]) && (GetTypePathPoint(_map, x, y) != PathPoint.PointType.pass))
@@ -316,7 +343,9 @@ public class Game : MonoBehaviour {
 		}
 	}
 
-	// Находит ближайшую доступную ключевую точку
+	/// <summary>
+	/// Находит ближайшую доступную ключевую точку
+	/// </summary>
 	void FindClosePathPoint (char[,] _pointsMap, PathPoint pp, Move.MoveState direction)
 	{
 		int dx=0, dy=0;
@@ -416,20 +445,26 @@ public class Game : MonoBehaviour {
 		}
 	}
 
-	// Обновляет количество жизней
+	/// <summary>
+	/// Обновляет количество жизней
+	/// </summary>
 	void UpdateLives ()
 	{
 		LivesSprite.width = prm.LivesCount * 44;
 	}
 	
-	// Добавляет очки
+	/// <summary>
+	/// Добавляет очки
+	/// </summary>
 	public void AddScore (int score)
 	{
 		prm.Score += score;
 		ScoreLabel.text = prm.Score.ToString();
 	}
 
-	// Обновляет название карты и её порядковый номер
+	/// <summary>
+	/// Обновляет название карты и её порядковый номер
+	/// </summary>
 	void UpdateLevelGUI ()
 	{
 		try
@@ -443,7 +478,9 @@ public class Game : MonoBehaviour {
 		}
 	}
 
-	// Переход на следующий уровень
+	/// <summary>
+	/// Переход на следующий уровень
+	/// </summary>
 	public void NextLevel ()
 	{
 		if (prm.CurrentLevel++ <= prm.MaxLevel)
@@ -455,19 +492,21 @@ public class Game : MonoBehaviour {
 			EndGame();
 			MainController.Instance.MainControl(MainController.TypeSystemActions.ShowEndGame);
 		}
-		/*---------- З А Г Л У Ш К А ----------*/
 	}
 	
-	// Показывает конец игры
+	/// <summary>
+	/// Показывает конец игры
+	/// </summary>
 	void EndGame ()
 	{
 		Time.timeScale = 0f;
 		ScoreEndLabel.text = prm.Score.ToString();
 		StageEndLabel.text = prm.CurrentLevel.ToString()+"/"+prm.MaxLevel.ToString();
-		/*---------- З А Г Л У Ш К А ----------*/
 	}
 
-	// Показывает выбранное игровое сообщение
+	/// <summary>
+	/// Показывает выбранное игровое сообщение
+	/// </summary>
 	public void ShowGameMessage (MessageState _GameMessageState)
 	{
 		GameMessageState = _GameMessageState;
@@ -487,7 +526,9 @@ public class Game : MonoBehaviour {
 		}
 	}
 
-	// Закрывает текущее информационное окно и выполняет соответствующие действия
+	/// <summary>
+	/// Закрывает текущее информационное окно и выполняет соответствующие действия
+	/// </summary>
 	public void CloseMessage ()
 	{
 		GameMessageLabel.gameObject.SetActive(false);
@@ -512,98 +553,36 @@ public class Game : MonoBehaviour {
 		GameMessageState = MessageState.none;
 	}
 
-	/*XmlAttribute GetXmlAttr (XmlDocument doc, string TitleAttr)
+	/// <summary>
+	/// Сохраняем игру в файл
+	/// </summary>
+	public void SaveGame ()
 	{
-		XmlAttribute TmpAttr = doc.CreateAttribute(TitleAttr);
-		return
-	}*/
+		PlayerPrefs.SetString("LastGameGUID", prm.CurrentMap.GUID);
+		PlayerPrefs.SetInt("MaxLevel", prm.MaxLevel);
+		PlayerPrefs.SetInt("LastLevel", prm.CurrentLevel);
+		PlayerPrefs.SetInt("LastScore", prm.Score);
+		PlayerPrefs.SetInt("LastLives", prm.LivesCount);
+	}
 
-	// Сохраняем игру в файл
-	/*public void SaveGame ()
-	{
-
-
-
-			// Создаём файловое хранилище
-			XmlDocument xmlDoc = new XmlDocument ();
-			XmlNode rootNode = null;
-			rootNode = xmlDoc.CreateElement ("data");
-			xmlDoc.AppendChild (rootNode);
-			
-			//XmlNodeList levelList = xmlDoc.GetElementsByTagName ("level");
-			
-			foreach (Map m in Maps)
-			{
-				// Запись в файл
-				XmlElement elmNew = xmlDoc.CreateElement ("level");
-				XmlAttribute GUID = xmlDoc.CreateAttribute ("GUID");
-				XmlAttribute TITLE = xmlDoc.CreateAttribute ("TITLE");
-				XmlAttribute WIDTH = xmlDoc.CreateAttribute ("WIDTH");
-				XmlAttribute HEIGHT = xmlDoc.CreateAttribute ("HEIGHT");
-				XmlAttribute MAP = xmlDoc.CreateAttribute ("MAP");
-				
-				XmlAttribute PacmanSpawnX = xmlDoc.CreateAttribute ("PacmanSpawnX");
-				XmlAttribute PacmanSpawnY = xmlDoc.CreateAttribute ("PacmanSpawnY");
-				XmlAttribute GhostsX = xmlDoc.CreateAttribute ("GhostsX");
-				XmlAttribute GhostsY = xmlDoc.CreateAttribute ("GhostsY");
-				XmlAttribute Blinky = xmlDoc.CreateAttribute ("Blinky");
-				XmlAttribute Pinky = xmlDoc.CreateAttribute ("Pinky");
-				XmlAttribute Inky = xmlDoc.CreateAttribute ("Inky");
-				XmlAttribute Clyde = xmlDoc.CreateAttribute ("Clyde");
-				
-				GUID.Value = m.GUID;
-				TITLE.Value = m.title;
-				WIDTH.Value = m.width.ToString();
-				HEIGHT.Value = m.height.ToString();
-				MAP.Value = string.Join("/", m.map);
-				
-				PacmanSpawnX.Value = ((int) (m.PacmanSpawn.x)).ToString();
-				PacmanSpawnY.Value = ((int) (m.PacmanSpawn.y)).ToString();
-				GhostsX.Value = ((int) (m.Ghosts.x)).ToString();
-				GhostsY.Value = ((int) (m.Ghosts.y)).ToString();
-				Blinky.Value = m.Blinky.ToString();
-				Pinky.Value = m.Pinky.ToString();
-				Inky.Value = m.Inky.ToString();
-				Clyde.Value = m.Clyde.ToString();
-				
-				elmNew.SetAttributeNode (GUID);
-				elmNew.SetAttributeNode (TITLE);
-				elmNew.SetAttributeNode (WIDTH);
-				elmNew.SetAttributeNode (HEIGHT);
-				elmNew.SetAttributeNode (MAP);
-				
-				elmNew.SetAttributeNode (PacmanSpawnX);
-				elmNew.SetAttributeNode (PacmanSpawnY);
-				elmNew.SetAttributeNode (GhostsX);
-				elmNew.SetAttributeNode (GhostsY);
-				elmNew.SetAttributeNode (Blinky);
-				elmNew.SetAttributeNode (Pinky);
-				elmNew.SetAttributeNode (Inky);
-				elmNew.SetAttributeNode (Clyde);			
-				
-				rootNode.AppendChild (elmNew);
-			} 
-			
-			xmlDoc.Save (Path.Combine(Application.dataPath, "game.sav"));
-		
-	}*/
-
-	// Загружаем игру из файла
+	/// <summary>
+	/// Загружаем игру из файла
+	/// </summary>
 	public void LoadGame ()
 	{
-		
+
+		prm.MaxLevel =PlayerPrefs.GetInt("MaxLevel", 10);
+		prm.CurrentLevel = PlayerPrefs.GetInt("LastLevel", 1);
+		prm.Score = PlayerPrefs.GetInt("LastScore", 0);
+		prm.LivesCount = PlayerPrefs.GetInt("LastLives", 3);
+
+		prm.CurrentMap = MainController.Instance._LevelEditor.Maps.Find(m => m.GUID == PlayerPrefs.GetString("LastGameGUID", MainController.Instance._LevelEditor.Maps[0].GUID));
+		UpdateLevelGUI();
+		UpdateLives ();
+		AddScore (0);
+		LoadLevel ();
+		foreach (Move m in FindObjectsOfType<Move>()) {m.CheckStartParams();}
+		ShowGameMessage(MessageState.startgame);
 	}
 
-
-	// Use this for initialization
-	void Start () {
-	
-	}
-
-
-	// Update is called once per frame
-	void Update () {
-
-	
-	}
 }

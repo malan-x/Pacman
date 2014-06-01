@@ -1,10 +1,53 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Скрипт отвечающий за управление игроком
+/// </summary>
 [RequireComponent (typeof(SphereCollider))]
 public class Pacman : Move {
 
 	public Vector3 SourceTarget;
+
+	void Start()
+	{
+		InputSystem.Instance.eventOnSlideBegin += OnSlideBegin;
+	}
+
+
+	/// <summary>
+	/// Управление с помощью жестов
+	/// </summary>
+	public void OnSlideBegin(Vector3 beginPosition, Vector3 currentPosition) {
+		
+		Vector3 direction = (currentPosition - beginPosition).normalized;
+		float angleToUp = Vector3.Angle(direction, Vector3.up);
+		float angleToLeft = Vector3.Angle(direction, Vector3.left);
+		
+		
+			if(angleToUp <= 45) {
+				NextMoveStateUnit = MoveState.up;
+			} 
+			else {
+				if(angleToUp >= 135) {
+					NextMoveStateUnit = MoveState.down;
+				}
+				else {
+					if(angleToLeft <= 45) {
+						NextMoveStateUnit = MoveState.left;
+					}
+					else {
+						if(angleToLeft >= 135) {
+							NextMoveStateUnit = MoveState.right;
+						}
+					}
+				}
+			} 
+
+		
+		
+		
+	}
 
 	// Update is called once per frame
 	void Update () {
@@ -14,8 +57,9 @@ public class Pacman : Move {
 		else if (Input.GetKeyDown(KeyCode.UpArrow)) {NextMoveStateUnit = MoveState.up;}
 		else if (Input.GetKeyDown(KeyCode.DownArrow)) {NextMoveStateUnit = MoveState.down;}
 
+
 		// Игрок может сменить направление движения на противоположное в любой момент
-		if (!CanChangeDirection)
+		if (CurrentPathPoint&&!CanChangeDirection)
 		{
 			Vector3 cc = Vector3.zero;
 			if (((CurrentMoveStateUnit == MoveState.left) && (NextMoveStateUnit == MoveState.right))||
@@ -51,7 +95,9 @@ public class Pacman : Move {
 		if (TargetPoint == transform.position) {SourceTarget = TargetPoint;}
 	}
 
-	// Меняем направление движения на противоположное
+	/// <summary>
+	/// Меняем направление движения на противоположное
+	/// </summary>
 	void SwapDirections ()
 	{
 		CurrentMoveStateUnit = NextMoveStateUnit;
@@ -61,10 +107,11 @@ public class Pacman : Move {
 	}
 
 
-	// Обрабатываем столкновения с другими объектами
+	/// <summary>
+	/// Обрабатываем столкновения с другими объектами
+	/// </summary>
 	void OnTriggerEnter (Collider other)
 	{	
-//		print (other.tag);
 		switch (other.tag)
 		{
 		case "Bonuses":

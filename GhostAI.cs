@@ -2,6 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Скрипт отвечающий за поведение ботов
+/// </summary>
 public class GhostAI : Move {
 
 	public enum ModeBehavior {chase=0, around, outrun, backtobase}	// режимы привидения 
@@ -16,11 +19,6 @@ public class GhostAI : Move {
 	public List<PathPoint> CurrentPath = new List<PathPoint>();
 
 
-	// Use this for initialization
-	void Start () {
-		//StaticBatchingUtility.Combine(this.gameObject);
-	}
-	
 	// Update is called once per frame
 	void Update () {
 		if (CanChangeDirection)
@@ -83,29 +81,14 @@ public class GhostAI : Move {
 			BuffSpeed = 1f;
 			break;
 		}
-		/*---------- З А Г Л У Ш К А ----------*/
 	}
-
-	// Поиск конечной цели в зависимости от типа АИ
-	// ДОПИСАТЬ
-	/*PathPoint GetAim (ObjectType TypeAI)
-	{
-		switch (TypeAI)
-		{
-			
-		default:
-			return ;
-		}
-	}*/
-
-	//Процедура поиска путей
 
 	/// <summary>
 	/// Возвращает направление до указанного вектора
 	/// </summary>
 	MoveState GetDirectionToPoint (Vector3 target)
 	{
-
+		print (gameObject.name+" GetDirectionToPoint");
 		int x = (int) transform.localPosition.x;
 		int y = - (int) transform.localPosition.z;
 		int dx = (int) target.x;
@@ -147,11 +130,20 @@ public class GhostAI : Move {
 	/// </summary>
 	MoveState GetDirectionFrom2PathPoints (PathPoint fromPoint, PathPoint toPoint)
 	{
-		if (fromPoint.LeftPoint == toPoint) {return MoveState.left;}
-		else if (fromPoint.RightPoint == toPoint) {return MoveState.right;}
-		else if (fromPoint.UpPoint == toPoint) {return MoveState.up;}
-		else if (fromPoint.DownPoint == toPoint) {return MoveState.down;}
-		else return MoveState.stay;
+		print (gameObject.name+" GetDirectionFrom2PathPoints");
+		try
+		{
+			if (fromPoint.LeftPoint == toPoint) {return MoveState.left;}
+			else if (fromPoint.RightPoint == toPoint) {return MoveState.right;}
+			else if (fromPoint.UpPoint == toPoint) {return MoveState.up;}
+			else if (fromPoint.DownPoint == toPoint) {return MoveState.down;}
+			else return MoveState.stay;
+		}
+		catch (UnityException ex)
+		{
+			print (ex.Message);
+			return MoveState.stay;
+		}
 	}
 
 
@@ -160,18 +152,25 @@ public class GhostAI : Move {
 	/// </summary>
 	MoveState GetNotMarkedDirection (MoveState direction)
 	{
+		print (gameObject.name+" GetNotMarkedDirection");
 		if (CurrentPathPoint)
 		{
 			List<MoveState> marked = new List<MoveState>();
 			List<MoveState> unmarked = new List<MoveState>();
-			if (CurrentPathPoint.LeftPoint) {((PathList.Exists(d => d == CurrentPathPoint.LeftPoint))? marked : unmarked).Add(MoveState.left);}
-			if (CurrentPathPoint.RightPoint) {((PathList.Exists(d => d == CurrentPathPoint.RightPoint))? marked : unmarked).Add(MoveState.right);}
-			if (CurrentPathPoint.UpPoint) {((PathList.Exists(d => d == CurrentPathPoint.UpPoint))? marked : unmarked).Add(MoveState.up);}
-			if (CurrentPathPoint.DownPoint) {((PathList.Exists(d => d == CurrentPathPoint.DownPoint))? marked : unmarked).Add(MoveState.down);}
+			if (CurrentPathPoint.DistanceToLeft>0) {((PathList.Exists(d => d == CurrentPathPoint.LeftPoint))? marked : unmarked).Add(MoveState.left);}
+			if (CurrentPathPoint.DistanceToRight>0) {((PathList.Exists(d => d == CurrentPathPoint.RightPoint))? marked : unmarked).Add(MoveState.right);}
+			if (CurrentPathPoint.DistanceToUp>0) {((PathList.Exists(d => d == CurrentPathPoint.UpPoint))? marked : unmarked).Add(MoveState.up);}
+			if (CurrentPathPoint.DistanceToDown>0) {((PathList.Exists(d => d == CurrentPathPoint.DownPoint))? marked : unmarked).Add(MoveState.down);}
 
-			if (unmarked.Exists (d => d == direction)) {MarkedPoint++; return direction;}
-			else if (unmarked.Count > 0) {MarkedPoint++; return unmarked[UnityEngine.Random.Range(0, unmarked.Count)];}
-			else if (MarkedPoint >= prm.MaxPathPoints) {ChangeMode(ModeBehavior.chase); return GetDirection(TypeObject)	;}
+			if (unmarked.Exists (d => d == direction)) {MarkedPoints++; return direction;}
+			else if (unmarked.Count > 0) {MarkedPoints++; return unmarked[UnityEngine.Random.Range(0, unmarked.Count)];}
+			else if (MarkedPoints >= prm.MaxPathPoints) {ChangeMode(ModeBehavior.chase); return GetDirection(TypeObject);}	// если все точки пройдены, то режим меняется на преследование
+			else if (PathList.Exists(pp => pp == FindObjectOfType<Pacman>().CurrentPathPoint)) 						// если игрок прошел по изученной точке, то привидение стремится к ней, если по пути ему не встретятся непройденные точки
+			{
+				print (gameObject.name + " ");
+				CurrentPath = GetShortPath (GetAllPathes() , CurrentPathPoint, FindObjectOfType<Pacman>().CurrentPathPoint);
+				return GetDirectionFrom2PathPoints(CurrentPath[0], CurrentPath[CurrentPath.Count>1? 1 : 0]);
+			}
 			else if (marked.Count > 0) {return marked[UnityEngine.Random.Range(0, marked.Count)];}
 			else {return MoveState.stay;}
 		}
@@ -183,6 +182,7 @@ public class GhostAI : Move {
 	/// </summary>
 	MoveState GetOutrunDirection (MoveState firstDirection, MoveState secondDirection)
 	{
+		print (gameObject.name+" GetOutrunDirection");
 		List<MoveState> temp = new List<MoveState>();
 		if (CurrentPathPoint.LeftPoint) {temp.Add(MoveState.left);}
 		if (CurrentPathPoint.RightPoint) {temp.Add(MoveState.right);}
@@ -200,6 +200,7 @@ public class GhostAI : Move {
 	/// </summary>
 	public MoveState GetDirection (ObjectType TypeAI)
 	{
+		print (gameObject.name+" GetDirection");
 		switch (BehaviorMode)
 		{
 		case ModeBehavior.backtobase:	// Привидение возвращается в бункер где сможет снова восстановиться
@@ -250,13 +251,13 @@ public class GhostAI : Move {
 			{
 			case ObjectType.Blinky:
 				CurrentPath = GetShortPath (GetAllPathes() , CurrentPathPoint, GetCloserPathPoint(FindObjectOfType<Pacman>().TargetPoint));
-				return GetDirectionFrom2PathPoints(CurrentPath[0], CurrentPath[1]);
+				return GetDirectionFrom2PathPoints(CurrentPath[0], CurrentPath[CurrentPath.Count>1? 1 : 0]);
 			case ObjectType.Pinky:
 				CurrentPath = GetShortPath (GetAllPathes() , CurrentPathPoint, GetCloserPathPoint(FindObjectOfType<Pacman>().SourceTarget));
-				return GetDirectionFrom2PathPoints(CurrentPath[0], CurrentPath[1]);
+				return GetDirectionFrom2PathPoints(CurrentPath[0], CurrentPath[CurrentPath.Count>1? 1 : 0]);
 			case ObjectType.Inky:
 				CurrentPath = GetShortPath (GetAllPathes() , CurrentPathPoint, GetCloserPathPoint(FindObjectOfType<Pacman>().transform.position));
-				return GetDirectionFrom2PathPoints(CurrentPath[0], CurrentPath[1]);
+				return GetDirectionFrom2PathPoints(CurrentPath[0], CurrentPath[CurrentPath.Count>1? 1 : 0]);
 			default:
 				return 	(UnityEngine.Random.Range(0,4)<1 ? MoveState.left :
 				       	(UnityEngine.Random.Range(0,4)<2 ? MoveState.right:

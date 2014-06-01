@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Xml;
 using System.IO;
 
+/// <summary>
+/// Редактор уровней, активно взаимодействует с NGUI
+/// </summary>
 public class LevelEditor : MonoBehaviour {
 
 	// Типы кистей в редакторе уровней
@@ -40,23 +43,16 @@ public class LevelEditor : MonoBehaviour {
 	public UIPopupList WidthPopup;
 	public UIPopupList HeigthPopup;
 
+	// Элементы GUI в настройках
 	public PacmanGUIElement BlinkyButton;
 	public PacmanGUIElement PinkyButton;
 	public PacmanGUIElement InkyButton;
 	public PacmanGUIElement ClydeButton;
 
-	// Use this for initialization
-	void Start () {
 
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
-
-	// Генерирует пустую карту
+	/// <summary>
+	/// Генерирует пустую карту
+	/// </summary>
 	public void GenerateClearMap ()
 	{
 		if (CurrentMap)
@@ -90,7 +86,9 @@ public class LevelEditor : MonoBehaviour {
 		}
 	}
 
-	// Возвращает новый объект в списке карт
+	/// <summary>
+	/// Возвращает новый объект в списке карт
+	/// </summary>
 	Map GetNewMapItem (string _title, string _guid, int _width, int _height)
 	{
 		GameObject tempMap = Instantiate (MapPrefab) as GameObject;
@@ -109,7 +107,9 @@ public class LevelEditor : MonoBehaviour {
 		return tempMap.GetComponent<Map>();
 	}
 	
-	// Создать новую карту
+	/// <summary>
+	/// Создать новую карту
+	/// </summary>
 	public void CreateMap ()
 	{
 		try
@@ -129,8 +129,9 @@ public class LevelEditor : MonoBehaviour {
 
 	}
 	
-	// Сохранить карту
-	// Записываем редактируемую карту в выбранный Map-скрипт
+	/// <summary>
+	/// Записываем редактируемую карту в выбранный Map-скрипт
+	/// </summary>
 	public void SaveMap ()
 	{
 		if (CurrentMap)
@@ -154,7 +155,9 @@ public class LevelEditor : MonoBehaviour {
 		SaveMapsToXML("maps.xml");
 	}
 
-	// Функция возвращает символ клетки
+	/// <summary>
+	/// Функция возвращает символ клетки
+	/// </summary>
 	public char CellToChar (PenType _CellType)
 	{
 		switch (_CellType)
@@ -192,7 +195,9 @@ public class LevelEditor : MonoBehaviour {
 		}
 	}
 
-	// Функция возвращает тип клетки соответствующий символу
+	/// <summary>
+	/// Функция возвращает тип клетки соответствующий символу
+	/// </summary>
 	public PenType CharToCell (char _CellChar)
 	{
 		switch (_CellChar)
@@ -230,7 +235,9 @@ public class LevelEditor : MonoBehaviour {
 		}
 	}
 
-	// Загрузить карту в редактор
+	/// <summary>
+	/// Загрузить карту в редактор
+	/// </summary>
 	public void LoadMap ()
 	{
 		if (CurrentMap)
@@ -266,7 +273,9 @@ public class LevelEditor : MonoBehaviour {
 		}
 	}
 	
-	// Удалить карту
+	/// <summary>
+	/// Удалить карту
+	/// </summary>
 	public void DeleteMap ()
 	{
 		if (CurrentMap) 
@@ -280,7 +289,9 @@ public class LevelEditor : MonoBehaviour {
 
 	}
 
-	// Записываем карты в файл
+	/// <summary>
+	/// Записываем карты в файл
+	/// </summary>
 	void SaveMapsToXML(string storage)
 	{
 		// Создаём файловое хранилище
@@ -347,7 +358,9 @@ public class LevelEditor : MonoBehaviour {
 	}
 
 
-	// Чтение карт из файла
+	/// <summary>
+	/// Чтение карт из файла
+	/// </summary>
 	public void ReadMapsFromXML(string storage)
 	{
 		if (File.Exists(Path.Combine(Application.dataPath, storage)))
@@ -382,6 +395,7 @@ public class LevelEditor : MonoBehaviour {
 	
 	void OnEnable ()
 	{
+		// Считывает имеющиеся в файле карты
 		ReadMapsFromXML("maps.xml");
 	}
 }

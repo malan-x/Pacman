@@ -2,6 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Основной скрипт отвечающий работу приложения и переходы между экранами
+/// </summary>
 public class MainController : Singleton<MainController> {
 
 	// Список Экранов
@@ -19,6 +22,7 @@ public class MainController : Singleton<MainController> {
 	// Текущий экран
 	public static TypeScreens CurrentScreen;
 
+	// Массивы, в которых находятся элементы GUI для каждого из типов экранов
 	public List<GameObject> StartMenuList;
 	public List<GameObject> GameList;
 	public List<GameObject> PauseGameMenuList;
@@ -88,7 +92,9 @@ public class MainController : Singleton<MainController> {
 	
 	}
 
-	// Устанавливаем сохранённые настройки
+	/// <summary>
+	/// Устанавливаем сохранённые настройки
+	/// </summary>
 	void SetOptionsValues ()
 	{
 		BlinkyToggle.value = prm.ShowBlinky = PlayerPrefs.GetInt("ShowBlinky", 1)==1;
@@ -103,7 +109,9 @@ public class MainController : Singleton<MainController> {
 		 
 	}
 
-	// Обновляем настройки
+	/// <summary>
+	/// Обновляем настройки
+	/// </summary>
 	void GetOptionsValues ()
 	{
 		PlayerPrefs.SetInt("ShowBlinky", (prm.ShowBlinky = BlinkyToggle.value)?1:0);
@@ -117,7 +125,9 @@ public class MainController : Singleton<MainController> {
 		PlayerPrefs.SetFloat("GameSpeed", prm.GameSpeed = SpeedSlider.value);
 	}
 
-	// Процедура возвращающая событие, из заданного набора, которое произошло раньше остальных
+	/// <summary>
+	/// Процедура возвращающая событие, из заданного набора, которое произошло раньше остальных
+	/// </summary>
 	public TypeSystemActions FirstPreviousTSA(TypeSystemActions[] TSAr)
 	{
 		for (int i = ListActions.Count-1; i>=0; i--) 
@@ -127,7 +137,9 @@ public class MainController : Singleton<MainController> {
 		return TypeSystemActions.None;
 	}
 
-	// Главная управляющая процедура
+	/// <summary>
+	/// Главная управляющая процедура
+	/// </summary>
 	public void MainControl(TypeSystemActions TSA)
 	{
 		// Список действий пользователя
@@ -138,13 +150,13 @@ public class MainController : Singleton<MainController> {
 			SetScreen(TypeScreens.StartMenu);
 			break;
 		case TypeSystemActions.StartGame:
+			GetOptionsValues();
 			SetScreen(TypeScreens.Game);
 			this.GetComponent<Game>().StartNewGame();
-			/*---------- З А Г Л У Ш К А ----------*/
 			break;
 		case TypeSystemActions.LoadGame:
 			SetScreen(TypeScreens.Game);
-			/*---------- З А Г Л У Ш К А ----------*/
+			this.GetComponent<Game>().LoadGame();
 			break;
 		case TypeSystemActions.ShowGameScreen:
 			SetScreen(TypeScreens.Game);
@@ -152,8 +164,6 @@ public class MainController : Singleton<MainController> {
 		case TypeSystemActions.SoundTurn:
 			/*---------- З А Г Л У Ш К А ----------*/
 			break;
-		case TypeSystemActions.SaveGame:
-			/*---------- З А Г Л У Ш К А ----------*/
 			break;
 		case TypeSystemActions.Close:
 			/*---------- З А Г Л У Ш К А ----------*/
@@ -166,8 +176,8 @@ public class MainController : Singleton<MainController> {
 			break;
 		case TypeSystemActions.BackToStartMenu:
 			if (ListActions[ListActions.Count-2] == TypeSystemActions.ShowOptions) {GetOptionsValues();}
+			if (CurrentScreen == TypeScreens.PauseGameMenu) {this.GetComponent<Game>().SaveGame();}
 			SetScreen(TypeScreens.StartMenu);
-			/*---------- З А Г Л У Ш К А ----------*/
 			break;
 		case TypeSystemActions.ShowOptions:
 			SetScreen(TypeScreens.Options);
@@ -185,7 +195,6 @@ public class MainController : Singleton<MainController> {
 
 			SetScreen(TypeScreens.Game);
 			this.GetComponent<Game>().Restart();
-			/*---------- З А Г Л У Ш К А ----------*/
 			break;		
 		case TypeSystemActions.PauseGame:
 			if (CurrentScreen == TypeScreens.Game)
@@ -198,11 +207,9 @@ public class MainController : Singleton<MainController> {
 				SetScreen(TypeScreens.Game);
 				this.GetComponent<Game>().ResumeGame();
 			}
-			/*---------- З А Г Л У Ш К А ----------*/
 			break;
 		case TypeSystemActions.ResumeGame:
 			SetScreen(TypeScreens.Game);
-			/*---------- З А Г Л У Ш К А ----------*/
 			break;
 		case TypeSystemActions.CreateMap:
 			_LevelEditor.CreateMap();
@@ -225,7 +232,9 @@ public class MainController : Singleton<MainController> {
 		}
 	}
 
-	// Установка выбранного экрана
+	/// <summary>
+	/// Установка выбранного экрана
+	/// </summary>
 	public void SetScreen(TypeScreens s)
 	{
 		CurrentScreen = s;
@@ -262,7 +271,9 @@ public class MainController : Singleton<MainController> {
 		}
 	}
 
-	// Отключает активные объекты GUI (при clear == true) и активирует объекты из списка templist
+	/// <summary>
+	/// Отключает активные объекты GUI (при clear == true) и активирует объекты из списка templist
+	/// </summary>
 	void ChangeScreen (List<GameObject> templist, bool clear)
 	{
 		if (clear)

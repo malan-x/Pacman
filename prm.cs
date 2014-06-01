@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-// Статический класс для хранения переменных
+/// <summary>
+/// Статический класс для хранения переменных
+/// </summary>
 public static class prm{
 
 	public static Map CurrentMap;
@@ -16,11 +18,11 @@ public static class prm{
 	public static float PacmanSpeed = 1.5f;		// Скорость игрока
 	public static float GhostSpeed = 1f;		// Скорость привидений
 	public static float MaxTimeFear = 5f;		// Скорость привидений
-	public static bool ShowBlinky = true;				// Показывать ли Блинки
-	public static bool ShowPinky = true;				// Показывать ли Пинки
-	public static bool ShowInky = true;				// Показывать ли Инки
-	public static bool ShowClyde = true;				// Показывать ли Клайда
-	public static float MusicVolume = 1f;
-	public static float SoundVolume = 1f;
+	public static bool ShowBlinky = true;		// Показывать ли Блинки
+	public static bool ShowPinky = true;		// Показывать ли Пинки
+	public static bool ShowInky = true;			// Показывать ли Инки
+	public static bool ShowClyde = true;		// Показывать ли Клайда
+	public static float MusicVolume = 1f;		// Громкость музыки
+	public static float SoundVolume = 1f;		// Громкость звука
 	public static int MaxPathPoints;			// Общее количество ключевых точек н текущей карте
 }

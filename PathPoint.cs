@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-// Скрипт отвечающий за поиск путей
-// Объект с этим скриптом будет располагаться на каждой развилке или тупике
+/// <summary>
+/// Скрипт отвечающий за поиск путей
+/// Объект с этим скриптом будет располагаться на каждой развилке или тупике
+/// </summary>
 [RequireComponent (typeof(SphereCollider))]
 public class PathPoint : MonoBehaviour {
 
@@ -19,21 +21,12 @@ public class PathPoint : MonoBehaviour {
 	public int DistanceToUp=0;
 	public int DistanceToDown=0;
 
-	//public Move.MoveState 
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
+	/// <summary>
+	/// Автоматически становится текущей ключевой точке у персонажа и заносится в общий список пройденных точек
+	/// </summary>
 	void OnTriggerEnter (Collider other)
 	{	
-		//print (other.tag);
 		if (other.tag=="PacMan"||other.tag=="Ghosts") 
 		{
 			other.GetComponent<Move>().CurrentPathPoint = this;

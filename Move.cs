@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-// Скрипт отвечающий за передвижения персонажей
+/// <summary>
+/// Скрипт отвечающий за передвижения персонажей
+/// </summary>
 public class Move : MonoBehaviour {
 
 	public enum MoveState {stay=0, left, right, up, down}	//Возможные направления движения персонажа
@@ -21,8 +23,9 @@ public class Move : MonoBehaviour {
 	public PathPoint CurrentPathPoint;	// текущая ключевая точка
 
 	public List<PathPoint> PathList;	//список пройденного пути
-	public int MarkedPoint = 0;	//количество пройденных на карте уникальных ключевых точек
-	
+
+	public int MarkedPoints = 0;	//Количество уникальных пройденных ключевых точек
+
 	// Use this for initialization
 	void Start () {
 	}
@@ -49,7 +52,7 @@ public class Move : MonoBehaviour {
 			gameObject.SetActive(prm.CurrentMap.Clyde);
 			break;
 		}
-		MarkedPoint = 0;
+		MarkedPoints = 0;
 		PathList.Clear();
 	}
 
@@ -284,7 +287,7 @@ public class Move : MonoBehaviour {
 			if (transform.position.x>prm.CurrentMap.width) {transform.Translate (new Vector3 (-((2* ((float) prm.CurrentMap.width))-transform.position.x), 0f, 0f), Space.World);}
 			break;
 		case MoveState.up:
-			if (transform.position.z>0f) {transform.Translate (new Vector3 (0f, 0f, ((float) prm.CurrentMap.height)-transform.position.z), Space.World);}
+			if (transform.position.z>0f) {transform.Translate (new Vector3 (0f, 0f, -((float) prm.CurrentMap.height)-transform.position.z), Space.World);}
 			break;
 		case MoveState.down:
 			if (transform.position.z < -prm.CurrentMap.height) {transform.Translate (new Vector3 (0f, 0f, (2*(float) prm.CurrentMap.height)+transform.position.z), Space.World);}
