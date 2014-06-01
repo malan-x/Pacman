@@ -76,7 +76,7 @@ public class MainController : Singleton<MainController> {
 	public AudioSource SoundEatGhost;
 	public AudioSource SoundDeath;
 	public AudioSource SoundIntermission;
-	
+
 	//Список всех действий
 	public List<TypeSystemActions> ListActions = new List<TypeSystemActions>();
 
@@ -92,6 +92,7 @@ public class MainController : Singleton<MainController> {
 
 		// Устанавливаем значения настроек
 		SetOptionsValues();
+		GetOptionsValues();
 	}
 	
 	// Update is called once per frame
